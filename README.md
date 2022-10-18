@@ -5,21 +5,21 @@ Quiz Master is a interactive CLI app that you can play along with it.
 ## Specifications
 ### Should have following commands
 - help: Shows list of available command
-  - e.g.: ```sh help```
+  - e.g.: ```$ help```
 - create_question: Create a question, return error if duplicate
-  - e.g.: ```sh create_question 1 "How many words is 'Quipper'?" 7```
+  - e.g.: ```$ create_question 1 "How many words is 'Quipper'?" 7```
 - update_question: Update a question, return error if not found
-  - e.g.: ```sh update_question 1 "How many words is 'TQIF'?" 4```
+  - e.g.: ```$ update_question 1 "How many words is 'TQIF'?" 4```
 - delete_question: Delete a question, return error if not found
-  - e.g.: ```sh delete_question 1```
+  - e.g.: ```$ delete_question 1```
 - question: Shows a question, return error if not found
-  - e.g.: ```sh question 1```
+  - e.g.: ```$ question 1```
 - questions: Shows all questions
-  - e.g.: ```sh questions```
+  - e.g.: ```$ questions```
 - answer_question: Answer a question, it will return "Correct!" or "Incorrect!"
-  - e.g.: ```sh answer_question 1 7```
+  - e.g.: ```$ answer_question 1 7```
 - exit: Exit Quiz Master CLI
-  - e.g.: ```sh exit```
+  - e.g.: ```$ exit```
 
 ### Should recognize numbers
 If the answer in/contains a number, it should recognize the number
@@ -40,4 +40,20 @@ A : five
 
 Answer : 5 is correct
 Answer : five is correct
+```
+
+## Setup
+This following command will run all unit tests and compile the code as `/bin/quiz_master` (linux binary)
+```
+$ ./bin/setup
+```
+
+## Run
+Run the app binary
+```
+$ ./bin/quiz_master
+```
+Run using Golang
+```
+$ go run main.go
 ```
