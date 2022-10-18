@@ -1,0 +1,10 @@
+echo "Downloading dependencies..."
+go mod download
+
+echo "Running unit tests..."
+go test ./... -v -cover
+
+echo "Compiling..."
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -trimpath -o ./bin/quiz_master ./main.go
+
+echo "Done!"
