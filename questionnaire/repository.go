@@ -13,7 +13,7 @@ var (
 
 type Repository interface {
 	// GetByID gets question by id, returns error if any
-	GetByID(ctx context.Context, ID int) (*Question, error)
+	GetByID(ctx context.Context, id int) (*Question, error)
 	// GetAll gets questions, returns error if any
 	GetAll(ctx context.Context) ([]Question, error)
 	// Create creates question, returns error if any
@@ -21,7 +21,7 @@ type Repository interface {
 	// Update updates existing question, return error if any
 	Update(ctx context.Context, question *Question) error
 	// Delete deletes existing question, return error if any
-	Delete(ctx context.Context, ID int) error
+	Delete(ctx context.Context, id int) error
 }
 
 func NewRepository() Repository {
@@ -35,12 +35,12 @@ type inmemRepository struct {
 	questions []Question
 }
 
-func (r *inmemRepository) GetByID(ctx context.Context, ID int) (*Question, error) {
+func (r *inmemRepository) GetByID(ctx context.Context, id int) (*Question, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
 	for _, question := range r.questions {
-		if ID == question.ID {
+		if id == question.ID {
 			return &question, nil
 		}
 	}
@@ -79,11 +79,12 @@ func (r *inmemRepository) Update(ctx context.Context, question *Question) error 
 	return ErrQuestionNotFound
 }
 
-func (r *inmemRepository) Delete(ctx context.Context, ID int) error {
+func (r *inmemRepository) Delete(ctx context.Context, id int) error {
 	var index *int
+
 	r.mu.RLock()
 	for i := range r.questions {
-		if ID == r.questions[i].ID {
+		if id == r.questions[i].ID {
 			index = &i
 			break
 		}

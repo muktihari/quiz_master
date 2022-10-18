@@ -7,9 +7,9 @@ Quiz Master is a interactive CLI app that you can play along with it.
 - help: Shows list of available command
   - e.g.: ```$ help```
 - create_question: Create a question, return error if duplicate
-  - e.g.: ```$ create_question 1 "How many words is 'Quipper'?" 7```
+  - e.g.: ```$ create_question 1 "How many characters are there in \"Quipper\"?" 7```
 - update_question: Update a question, return error if not found
-  - e.g.: ```$ update_question 1 "How many words is 'TQIF'?" 4```
+  - e.g.: ```$ update_question 1 "How many characters are there in 'TQIF'?" 4```
 - delete_question: Delete a question, return error if not found
   - e.g.: ```$ delete_question 1```
 - question: Shows a question, return error if not found

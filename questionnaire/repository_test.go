@@ -2,6 +2,7 @@ package questionnaire
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -9,7 +10,7 @@ import (
 
 func TestInmemRepositoryGetByID(t *testing.T) {
 	questions := []Question{
-		{ID: 1, Question: "How many word in \"Quipper\"?", Answer: "7"},
+		{ID: 1, Question: "How many characters are there in \"Quipper\"?", Answer: "7"},
 	}
 
 	tt := []struct {
@@ -41,7 +42,7 @@ func TestInmemRepositoryGetByID(t *testing.T) {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			question, err := r.GetByID(ctx, tc.QuestionID)
-			if tc.ExpectedErr != err {
+			if !errors.Is(tc.ExpectedErr, err) {
 				t.Fatal(err)
 			}
 			if diff := cmp.Diff(tc.ExpectedQuestion, question); diff != "" {
@@ -53,7 +54,7 @@ func TestInmemRepositoryGetByID(t *testing.T) {
 
 func TestInmemRepositoryGetAll(t *testing.T) {
 	expectedQuestions := []Question{
-		{ID: 1, Question: "How many word in \"Quipper\"?", Answer: "7"},
+		{ID: 1, Question: "How many characters are there in \"Quipper\"?", Answer: "7"},
 		{ID: 2, Question: "Guess random number, 1, 2, 3 or 4?", Answer: "4"},
 	}
 
@@ -78,7 +79,7 @@ func TestInmemRepositoryGetAll(t *testing.T) {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			questions, err := r.GetAll(ctx)
-			if tc.ExpectedErr != err {
+			if !errors.Is(tc.ExpectedErr, err) {
 				t.Fatal(err)
 			}
 			if diff := cmp.Diff(tc.ExpectedQuestions, questions); diff != "" {
@@ -90,8 +91,8 @@ func TestInmemRepositoryGetAll(t *testing.T) {
 
 func TestInmemRepositoryCreate(t *testing.T) {
 	var (
-		question1 = Question{ID: 1, Question: "How many word in \"Quipper\"?", Answer: "7"}
-		question2 = Question{ID: 2, Question: "Guess random number, 1, 2, 3 or 4?", Answer: "4"}
+		question1 = Question{ID: 1, Question: "How many characters are there in \"Quipper\"?", Answer: "7"}
+		question2 = Question{ID: 2, Question: "Guess random number: 1, 2, 3 or 4?", Answer: "4"}
 		question3 = Question{ID: 3, Question: "Quipper vs Ruangguru?", Answer: "Quipper"}
 	)
 
@@ -119,6 +120,7 @@ func TestInmemRepositoryCreate(t *testing.T) {
 	}
 
 	ctx := context.Background()
+
 	for _, tc := range tt {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
@@ -128,7 +130,7 @@ func TestInmemRepositoryCreate(t *testing.T) {
 			)
 			inmemRepo.questions = tc.QuestionInmemDB
 
-			if err := r.Create(ctx, tc.Question); tc.ExpectedErr != err {
+			if err := r.Create(ctx, tc.Question); !errors.Is(tc.ExpectedErr, err) {
 				t.Fatal(err)
 			}
 			if diff := cmp.Diff(tc.ExpectedQuestionsAfterCreated, inmemRepo.questions); diff != "" {
@@ -140,11 +142,11 @@ func TestInmemRepositoryCreate(t *testing.T) {
 
 func TestInmemRepositoryUpdate(t *testing.T) {
 	var (
-		question1 = Question{ID: 1, Question: "How many word in \"Quipper\"?", Answer: "7"}
+		question1 = Question{ID: 1, Question: "How many characters are there in \"Quipper\"?", Answer: "7"}
 		question2 = Question{ID: 2, Question: "Guess random number, 1, 2, 3 or 4?", Answer: "4"}
 		question3 = Question{ID: 3, Question: "Quipper vs Ruangguru?", Answer: "Quipper"}
 
-		updatedQuestion1 = Question{ID: 1, Question: "How many words in \"Quipper\"?", Answer: "7"}
+		updatedQuestion1 = Question{ID: 1, Question: "How many characterss in \"Quipper\"?", Answer: "7"}
 	)
 
 	tt := []struct {
@@ -171,6 +173,7 @@ func TestInmemRepositoryUpdate(t *testing.T) {
 	}
 
 	ctx := context.Background()
+
 	for _, tc := range tt {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
@@ -180,7 +183,7 @@ func TestInmemRepositoryUpdate(t *testing.T) {
 			)
 			inmemRepo.questions = tc.QuestionInmemDB
 
-			if err := r.Update(ctx, tc.Question); tc.ExpectedErr != err {
+			if err := r.Update(ctx, tc.Question); !errors.Is(tc.ExpectedErr, err) {
 				t.Fatal(err)
 			}
 			if diff := cmp.Diff(tc.ExpectedQuestionsAfterUpdated, inmemRepo.questions); diff != "" {
@@ -192,7 +195,7 @@ func TestInmemRepositoryUpdate(t *testing.T) {
 
 func TestInmemRepositoryDelete(t *testing.T) {
 	var (
-		question1 = Question{ID: 1, Question: "How many word in \"Quipper\"?", Answer: "7"}
+		question1 = Question{ID: 1, Question: "How many characters are there in \"Quipper\"?", Answer: "7"}
 		question2 = Question{ID: 2, Question: "Guess random number, 1, 2, 3 or 4?", Answer: "4"}
 		question3 = Question{ID: 3, Question: "Quipper vs Ruangguru?", Answer: "Quipper"}
 	)
@@ -221,6 +224,7 @@ func TestInmemRepositoryDelete(t *testing.T) {
 	}
 
 	ctx := context.Background()
+
 	for _, tc := range tt {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
@@ -230,7 +234,7 @@ func TestInmemRepositoryDelete(t *testing.T) {
 			)
 			inmemRepo.questions = tc.QuestionInmemDB
 
-			if err := r.Delete(ctx, tc.QuestionID); tc.ExpectedErr != err {
+			if err := r.Delete(ctx, tc.QuestionID); !errors.Is(tc.ExpectedErr, err) {
 				t.Fatal(err)
 			}
 			if diff := cmp.Diff(tc.ExpectedQuestionsAfterDeleted, inmemRepo.questions); diff != "" {

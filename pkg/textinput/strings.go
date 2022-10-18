@@ -14,7 +14,7 @@ func Split(s string, seps ...rune) []string {
 	return SplitWithOptions(s, seps, true, false)
 }
 
-// SplitWithOptions slices s into all substring seperated by any if given seps and return a slice of
+// SplitWithOptions slices s into all substring separated by any if given seps and return a slice of
 // the substrings between those separators with options of quote awareness and/or to include seps in the results.
 // Examples:
 //
@@ -29,7 +29,8 @@ func Split(s string, seps ...rune) []string {
 //     > []string{"create_question", " ", "1", " ", "\"Who am I?\”", " ", "me"}
 //  4. Without Quote Awareness incude Separators (multiple) (seps: []rune{' ', ',', '?', '(', ')'})
 //     - create_question 1 "1, 2 or (3)?" 3
-//     > []string{"create_question", " ", "1", " ", "\"1", ",", " ", "2", " ", "or", " ", "(", "3", ")", "?", "\"", " ", "3"}
+//     > []string{"create_question", " ", "1", " ", "\"1", ",", " ", "2", " ", "or",
+//     " ", "(", "3", ")", "?", "\"", " ", "3"}
 func SplitWithOptions(s string, seps []rune, quoteAware, includeSep bool) []string {
 	var (
 		quoteFlag bool
@@ -37,6 +38,7 @@ func SplitWithOptions(s string, seps []rune, quoteAware, includeSep bool) []stri
 		subseps   []string
 		msep      = make(map[rune]struct{})
 	)
+
 	for _, sep := range seps {
 		msep[sep] = struct{}{}
 	}
@@ -45,20 +47,23 @@ func SplitWithOptions(s string, seps []rune, quoteAware, includeSep bool) []stri
 		if quoteAware && c == '"' {
 			quoteFlag = !quoteFlag
 		}
+
 		if _, ok := msep[c]; ok && !quoteFlag {
-			if !quoteFlag {
-				if len(stream) != 0 {
-					subseps = append(subseps, string(stream))
-				}
-				if includeSep {
-					subseps = append(subseps, string(c))
-				}
-				stream = []rune{}
-				continue
+			if len(stream) != 0 {
+				subseps = append(subseps, string(stream))
 			}
+
+			if includeSep {
+				subseps = append(subseps, string(c))
+			}
+
+			stream = []rune{}
+			continue
 		}
+
 		stream = append(stream, c)
 	}
+
 	subseps = append(subseps, string(stream))
 
 	return subseps
@@ -101,6 +106,7 @@ func RecognizedAsNumber(s string) string {
 		case "nine":
 			part = "9"
 		}
+
 		parts[i] = part
 	}
 

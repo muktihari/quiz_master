@@ -13,20 +13,20 @@ import (
 	"github.com/muktihari/quiz_master/questionnaire"
 )
 
-// Command is command inside the CLI
+// Command is command inside the CLI.
 type Command string
 
 const (
-	EXIT            Command = "exit"
-	HELP            Command = "help"
-	QUESTION        Command = "question"
-	QUESTIONS       Command = "questions"
-	CREATE_QUESTION Command = "create_question"
-	UPDATE_QUESTION Command = "update_question"
-	DELETE_QUESTION Command = "delete_question"
-	ANSWER_QUESTION Command = "answer_question"
+	Exit           Command = "exit"
+	Help           Command = "help"
+	Question       Command = "question"
+	Questions      Command = "questions"
+	CreateQuestion Command = "create_question"
+	UpdateQuestion Command = "update_question"
+	DeleteQuestion Command = "delete_question"
+	AnswerQuestion Command = "answer_question"
 
-	HELP_TEXT = "Command | Description\n" +
+	HelpText = "Command | Description\n" +
 		"help | Shows list of available command\n" +
 		"create_question <no> <question> <answer> | Create a question\n" +
 		"update_question <no> <question> <answer> | Update a question\n" +
@@ -35,7 +35,7 @@ const (
 		"questions | Shows list of question\n" +
 		"exit | Exit CLI\n"
 
-	PRINT_FORMAT = "Q: \"%s\"\nA: %s\n"
+	PrintFormat = "Q: \"%s\"\nA: %s\n"
 )
 
 func main() {
@@ -51,6 +51,7 @@ func main() {
 
 func run(ctx context.Context, qs questionnaire.Service, in io.Reader, out io.Writer) int {
 	scanner := bufio.NewScanner(in)
+
 	for {
 		fmt.Fprintf(out, "$ ")
 		scanner.Scan()
@@ -61,21 +62,21 @@ func run(ctx context.Context, qs questionnaire.Service, in io.Reader, out io.Wri
 		)
 
 		switch cmd {
-		case EXIT:
+		case Exit:
 			return 0
-		case HELP:
-			fmt.Fprint(out, HELP_TEXT)
-		case QUESTION:
+		case Help:
+			fmt.Fprint(out, HelpText)
+		case Question:
 			question(ctx, qs, args, out)
-		case QUESTIONS:
+		case Questions:
 			questions(ctx, qs, args, out)
-		case CREATE_QUESTION:
+		case CreateQuestion:
 			createQuestion(ctx, qs, args, out)
-		case UPDATE_QUESTION:
+		case UpdateQuestion:
 			updateQuestion(ctx, qs, args, out)
-		case DELETE_QUESTION:
+		case DeleteQuestion:
 			deleteQuestion(ctx, qs, args, out)
-		case ANSWER_QUESTION:
+		case AnswerQuestion:
 			answerQuestion(ctx, qs, args, out)
 		default:
 			fmt.Fprintf(out, "Command \"%s\" is not found. See \"help\"\n", cmd)
@@ -88,28 +89,30 @@ func question(ctx context.Context, qs questionnaire.Service, args []string, out 
 		fmt.Fprintln(out, "Invalid input format. See \"help\"")
 		return
 	}
-	ID, err := strconv.ParseInt(args[1], 10, 64)
+
+	id, err := strconv.ParseInt(args[1], 10, 64)
 	if err != nil {
 		fmt.Fprintln(out, "Invalid question ID, should be integer")
 		return
 	}
 
-	question, err := qs.GetByID(ctx, int(ID))
+	question, err := qs.GetByID(ctx, int(id))
 	if err != nil {
-		fmt.Fprintf(out, "Could not get question [%d]: %v\n", ID, err)
+		fmt.Fprintf(out, "Could not get question [%d]: %v\n", id, err)
 		return
 	}
-	fmt.Fprintf(out, PRINT_FORMAT, question.Question, question.Answer)
+
+	fmt.Fprintf(out, PrintFormat, question.Question, question.Answer)
 }
 
-func questions(ctx context.Context, qs questionnaire.Service, args []string, out io.Writer) {
+func questions(ctx context.Context, qs questionnaire.Service, _ []string, out io.Writer) {
 	questions, err := qs.GetAll(ctx)
 	if err != nil {
 		fmt.Fprintln(out, err)
 		return
 	}
-
 	fmt.Fprintln(out, "No | Question | Answer")
+
 	for _, question := range questions {
 		fmt.Fprintf(out, "%d \"%s\" %s\n", question.ID, question.Question, question.Answer)
 	}
@@ -120,14 +123,15 @@ func createQuestion(ctx context.Context, qs questionnaire.Service, args []string
 		fmt.Fprintln(out, "Invalid input format. See \"help\"")
 		return
 	}
-	ID, err := strconv.ParseInt(args[1], 10, 64)
+
+	id, err := strconv.ParseInt(args[1], 10, 64)
 	if err != nil {
 		fmt.Fprintln(out, "Invalid question ID, should be integer")
 		return
 	}
 
 	question := &questionnaire.Question{
-		ID:       int(ID),
+		ID:       int(id),
 		Question: args[2],
 		Answer:   args[3],
 	}
@@ -137,7 +141,7 @@ func createQuestion(ctx context.Context, qs questionnaire.Service, args []string
 	}
 
 	fmt.Fprintf(out, "Question no %d created:\n", question.ID)
-	fmt.Fprintf(out, PRINT_FORMAT, question.Question, question.Answer)
+	fmt.Fprintf(out, PrintFormat, question.Question, question.Answer)
 }
 
 func updateQuestion(ctx context.Context, qs questionnaire.Service, args []string, out io.Writer) {
@@ -145,24 +149,25 @@ func updateQuestion(ctx context.Context, qs questionnaire.Service, args []string
 		fmt.Fprintf(out, "Invalid input format. See \"help\"\n")
 		return
 	}
-	ID, err := strconv.ParseInt(args[1], 10, 64)
+
+	id, err := strconv.ParseInt(args[1], 10, 64)
 	if err != nil {
 		fmt.Fprintln(out, "Invalid question ID, should be integer")
 		return
 	}
 
 	question := &questionnaire.Question{
-		ID:       int(ID),
+		ID:       int(id),
 		Question: args[2],
 		Answer:   args[3],
 	}
 	if err := qs.Update(ctx, question); err != nil {
-		fmt.Fprintf(out, "Could not update question [%d]: %v\n", ID, err)
+		fmt.Fprintf(out, "Could not update question [%d]: %v\n", id, err)
 		return
 	}
 
 	fmt.Fprintf(out, "Question no %d updated:\n", question.ID)
-	fmt.Fprintf(out, PRINT_FORMAT, question.Question, question.Answer)
+	fmt.Fprintf(out, PrintFormat, question.Question, question.Answer)
 }
 
 func deleteQuestion(ctx context.Context, qs questionnaire.Service, args []string, out io.Writer) {
@@ -170,18 +175,19 @@ func deleteQuestion(ctx context.Context, qs questionnaire.Service, args []string
 		fmt.Fprintln(out, "Invalid input format. See \"help\"")
 		return
 	}
-	ID, err := strconv.ParseInt(args[1], 10, 64)
+
+	id, err := strconv.ParseInt(args[1], 10, 64)
 	if err != nil {
 		fmt.Fprintln(out, "Invalid question ID, should be integer")
 		return
 	}
 
-	if err := qs.Delete(ctx, int(ID)); err != nil {
-		fmt.Fprintf(out, "Could not delete question [%d]: %v\n", ID, err)
+	if err := qs.Delete(ctx, int(id)); err != nil {
+		fmt.Fprintf(out, "Could not delete question [%d]: %v\n", id, err)
 		return
 	}
 
-	fmt.Fprintf(out, "Question no %d deleted:\n", ID)
+	fmt.Fprintf(out, "Question no %d deleted:\n", id)
 }
 
 func answerQuestion(ctx context.Context, qs questionnaire.Service, args []string, out io.Writer) {
@@ -189,15 +195,16 @@ func answerQuestion(ctx context.Context, qs questionnaire.Service, args []string
 		fmt.Fprintln(out, "Invalid input format. See \"help\"")
 		return
 	}
-	ID, err := strconv.ParseInt(args[1], 10, 64)
+
+	id, err := strconv.ParseInt(args[1], 10, 64)
 	if err != nil {
 		fmt.Fprintf(out, "Invalid question ID, should be integer")
 		return
 	}
 
-	correct, err := qs.Answer(ctx, int(ID), args[2])
+	correct, err := qs.Answer(ctx, int(id), args[2])
 	if err != nil {
-		fmt.Fprintf(out, "Could not answer question [%d]: %v\n", ID, err)
+		fmt.Fprintf(out, "Could not answer question [%d]: %v\n", id, err)
 		return
 	}
 

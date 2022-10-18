@@ -11,7 +11,7 @@ import (
 )
 
 func TestIntegrationScenario1(t *testing.T) {
-	// Integration test, the order in table test is important
+	// Integration test, the order in table test is important, can't be parallelized.
 	tt := []struct {
 		Name        string
 		In          string
@@ -20,7 +20,7 @@ func TestIntegrationScenario1(t *testing.T) {
 		{
 			Name:        "show help twice",
 			In:          "help\nhelp\nexit",
-			ExpectedOut: fmt.Sprintf("$ %s$ %s$ ", HELP_TEXT, HELP_TEXT),
+			ExpectedOut: fmt.Sprintf("$ %s$ %s$ ", HelpText, HelpText),
 		},
 		{
 			Name:        "invalid command",
@@ -29,55 +29,60 @@ func TestIntegrationScenario1(t *testing.T) {
 		},
 		// create
 		{
-			Name:        "create question 1 success",
-			In:          "create_question 1 \"How many words in 'Quipper'?\" 7\nexit",
-			ExpectedOut: fmt.Sprintf("$ Question no %d created:\n"+PRINT_FORMAT+"$ ", 1, "How many words in 'Quipper'?", "7"),
+			Name: "create question 1 success",
+			In:   "create_question 1 \"How many characters are there in \"Quipper\"?\" 7\nexit",
+			ExpectedOut: fmt.Sprintf("$ Question no %d created:\n"+PrintFormat+"$ ",
+				1, "How many characters are there in \"Quipper\"?", "7"),
 		},
 		{
-			Name:        "create question 2 success",
-			In:          "create_question 2 \"How many words in 'Quipperzz'?\" 9\nexit",
-			ExpectedOut: fmt.Sprintf("$ Question no %d created:\n"+PRINT_FORMAT+"$ ", 2, "How many words in 'Quipperzz'?", "9"),
+			Name: "create question 2 success",
+			In:   "create_question 2 \"How many characters are there in \"Quipperzz\"?\" 9\nexit",
+			ExpectedOut: fmt.Sprintf("$ Question no %d created:\n"+PrintFormat+"$ ",
+				2, "How many characters are there in \"Quipperzz\"?", "9"),
 		},
 		{
-			Name:        "create question 3 success",
-			In:          "create_question 3 \"How many words in 'Engineer'?\" 8\nexit",
-			ExpectedOut: fmt.Sprintf("$ Question no %d created:\n"+PRINT_FORMAT+"$ ", 3, "How many words in 'Engineer'?", "8"),
+			Name: "create question 3 success",
+			In:   "create_question 3 \"How many characters are there in \"Engineer\"?\" 8\nexit",
+			ExpectedOut: fmt.Sprintf("$ Question no %d created:\n"+PrintFormat+"$ ",
+				3, "How many characters are there in \"Engineer\"?", "8"),
 		},
 		{
 			Name:        "create question invalid ID",
-			In:          "create_question X \"How many words in 'Quipper'?\" 7\nexit",
+			In:          "create_question X \"How many characters are there in \"Quipper\"?\" 7\nexit",
 			ExpectedOut: "$ Invalid question ID, should be integer\n$ ",
 		},
 		{
 			Name:        "create question invalid command format",
-			In:          "create_question 1 \"How many words in 'Quipper'?\"\nexit",
+			In:          "create_question 1 \"How many characters are there in \"Quipper\"?\"\nexit",
 			ExpectedOut: "$ Invalid input format. See \"help\"\n$ ",
 		},
 		{
 			Name:        "create question failed duplicate",
-			In:          "create_question 1 \"How many words in 'Quipper'?\" 7\nexit",
+			In:          "create_question 1 \"How many characters are there in \"Quipper\"?\" 7\nexit",
 			ExpectedOut: "$ Could not create question: question is already exist\n$ ",
 		},
 		// update
 		{
-			Name:        "update question 2 success",
-			In:          "update_question 2 \"How many words in 'Quipperx'?\" 8\nexit",
-			ExpectedOut: fmt.Sprintf("$ Question no %d updated:\n"+PRINT_FORMAT+"$ ", 2, "How many words in 'Quipperx'?", "8"),
+			Name: "update question 2 success",
+			In:   "update_question 2 \"How many characters are there in 'Quipperx'?\" 8\nexit",
+			ExpectedOut: fmt.Sprintf("$ Question no %d updated:\n"+PrintFormat+"$ ",
+				2, "How many characters are there in 'Quipperx'?", "8"),
 		},
 		{
 			Name:        "update question invalid ID",
-			In:          "update_question X \"How many words in 'Quipper'?\" 7\nexit",
+			In:          "update_question X \"How many characters are there in \"Quipper\"?\" 7\nexit",
 			ExpectedOut: "$ Invalid question ID, should be integer\n$ ",
 		},
 		{
 			Name:        "update question invalid command format",
-			In:          "update_question 1 \"How many words in 'Quipper'?\"\nexit",
+			In:          "update_question 1 \"How many characters are there in \"Quipper\"?\"\nexit",
 			ExpectedOut: "$ Invalid input format. See \"help\"\n$ ",
 		},
 		{
-			Name:        "update question failed not found",
-			In:          "update_question 4 \"How many words in 'Quipper'?\" 7\nexit",
-			ExpectedOut: fmt.Sprintf("$ Could not update question [%d]: %v\n$ ", 4, questionnaire.ErrQuestionNotFound),
+			Name: "update question failed not found",
+			In:   "update_question 4 \"How many characters are there in \"Quipper\"?\" 7\nexit",
+			ExpectedOut: fmt.Sprintf("$ Could not update question [%d]: %v\n$ ",
+				4, questionnaire.ErrQuestionNotFound),
 		},
 		// delete
 		{
@@ -92,7 +97,7 @@ func TestIntegrationScenario1(t *testing.T) {
 		},
 		{
 			Name:        "delete question invalid command format",
-			In:          "delete_question 1 \"How many words in 'Quipper'?\"\nexit",
+			In:          "delete_question 1 \"How many characters are there in \"Quipper\"?\"\nexit",
 			ExpectedOut: "$ Invalid input format. See \"help\"\n$ ",
 		},
 		{
@@ -104,7 +109,7 @@ func TestIntegrationScenario1(t *testing.T) {
 		{
 			Name:        "question 1 success",
 			In:          "question 1\nexit",
-			ExpectedOut: "$ Q: \"How many words in 'Quipper'?\"\nA: 7\n$ ",
+			ExpectedOut: "$ Q: \"How many characters are there in \"Quipper\"?\"\nA: 7\n$ ",
 		},
 		{
 			Name:        "question invalid ID",
@@ -113,7 +118,7 @@ func TestIntegrationScenario1(t *testing.T) {
 		},
 		{
 			Name:        "question invalid command format",
-			In:          "question 1 \"How many words in 'Quipper'?\"\nexit",
+			In:          "question 1 \"How many characters are there in \"Quipper\"?\"\nexit",
 			ExpectedOut: "$ Invalid input format. See \"help\"\n$ ",
 		},
 		{
@@ -126,8 +131,8 @@ func TestIntegrationScenario1(t *testing.T) {
 			Name: "questions",
 			In:   "questions\nexit",
 			ExpectedOut: "$ No | Question | Answer\n" +
-				"1 \"How many words in 'Quipper'?\" 7\n" +
-				"3 \"How many words in 'Engineer'?\" 8\n$ ",
+				"1 \"How many characters are there in \"Quipper\"?\" 7\n" +
+				"3 \"How many characters are there in \"Engineer\"?\" 8\n$ ",
 		},
 		// answer
 		{

@@ -9,7 +9,7 @@ import (
 
 type Service interface {
 	// GetByID gets question by id, returns error if any
-	GetByID(ctx context.Context, ID int) (*Question, error)
+	GetByID(ctx context.Context, id int) (*Question, error)
 	// GetAll gets all questions, returns error if any
 	GetAll(ctx context.Context) ([]Question, error)
 	// Create creates question, returns error if any
@@ -17,9 +17,9 @@ type Service interface {
 	// Update updates existing question, return error if any
 	Update(ctx context.Context, question *Question) error
 	// Delete deletes existing question, return error if any
-	Delete(ctx context.Context, ID int) error
+	Delete(ctx context.Context, id int) error
 	// Answer checks whether given answer to specific question is correct
-	Answer(ctx context.Context, ID int, answer string) (bool, error)
+	Answer(ctx context.Context, id int, answer string) (bool, error)
 }
 
 func NewService(repository Repository) Service {
@@ -30,8 +30,8 @@ type service struct {
 	repository Repository
 }
 
-func (s *service) GetByID(ctx context.Context, ID int) (*Question, error) {
-	return s.repository.GetByID(ctx, ID)
+func (s *service) GetByID(ctx context.Context, id int) (*Question, error) {
+	return s.repository.GetByID(ctx, id)
 }
 
 func (s *service) GetAll(ctx context.Context) ([]Question, error) {
@@ -52,15 +52,16 @@ func (s *service) Update(ctx context.Context, question *Question) error {
 	return s.repository.Update(ctx, question)
 }
 
-func (s *service) Delete(ctx context.Context, ID int) error {
-	return s.repository.Delete(ctx, ID)
+func (s *service) Delete(ctx context.Context, id int) error {
+	return s.repository.Delete(ctx, id)
 }
 
-func (s *service) Answer(ctx context.Context, ID int, answer string) (bool, error) {
-	question, err := s.GetByID(ctx, ID)
+func (s *service) Answer(ctx context.Context, id int, answer string) (bool, error) {
+	question, err := s.GetByID(ctx, id)
 	if err != nil {
 		return false, err
 	}
+
 	question.Answer = textinput.RecognizedAsNumber(question.Answer)
 	answer = textinput.RecognizedAsNumber(strings.Trim(answer, "\""))
 

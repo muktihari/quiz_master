@@ -2,6 +2,7 @@ package questionnaire_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -18,8 +19,8 @@ type mockRepository struct {
 	deleteFunc  func(ctx context.Context, ID int) error
 }
 
-func (r *mockRepository) GetByID(ctx context.Context, ID int) (*questionnaire.Question, error) {
-	return r.getByIDFunc(ctx, ID)
+func (r *mockRepository) GetByID(ctx context.Context, id int) (*questionnaire.Question, error) {
+	return r.getByIDFunc(ctx, id)
 }
 
 func (r *mockRepository) GetAll(ctx context.Context) ([]questionnaire.Question, error) {
@@ -34,13 +35,13 @@ func (r *mockRepository) Update(ctx context.Context, question *questionnaire.Que
 	return r.updateFunc(ctx, question)
 }
 
-func (r *mockRepository) Delete(ctx context.Context, ID int) error {
-	return r.deleteFunc(ctx, ID)
+func (r *mockRepository) Delete(ctx context.Context, id int) error {
+	return r.deleteFunc(ctx, id)
 }
 
 func TestServiceGetByID(t *testing.T) {
 	var predefinedQuestions = []questionnaire.Question{
-		{ID: 1, Question: "How many word in \"Quipper\"?", Answer: "7"},
+		{ID: 1, Question: "How many characters are there in \"Quipper\"?", Answer: "7"},
 		{ID: 2, Question: "Guess random number, 1, 2, 3 or 4?", Answer: "4"},
 	}
 
@@ -76,11 +77,13 @@ func TestServiceGetByID(t *testing.T) {
 	}
 
 	ctx := context.Background()
+
 	for _, tc := range tt {
+		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			qs := questionnaire.NewService(tc.MockRepository)
 			question, err := qs.GetByID(ctx, tc.QuestionID)
-			if tc.ExpectedErr != err {
+			if !errors.Is(tc.ExpectedErr, err) {
 				t.Fatal(err)
 			}
 			if diff := cmp.Diff(tc.ExpectedQuestion, question); diff != "" {
@@ -92,9 +95,10 @@ func TestServiceGetByID(t *testing.T) {
 
 func TestServiceGetAll(t *testing.T) {
 	var predefinedQuestions = []questionnaire.Question{
-		{ID: 1, Question: "How many word in \"Quipper\"?", Answer: "7"},
+		{ID: 1, Question: "How many characters are there in \"Quipper\"?", Answer: "7"},
 		{ID: 2, Question: "Guess random number, 1, 2, 3 or 4?", Answer: "4"},
 	}
+
 	tt := []struct {
 		Name              string
 		MockRepository    questionnaire.Repository
@@ -124,12 +128,13 @@ func TestServiceGetAll(t *testing.T) {
 	}
 
 	ctx := context.Background()
+
 	for _, tc := range tt {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			qs := questionnaire.NewService(tc.MockRepository)
 			questions, err := qs.GetAll(ctx)
-			if tc.ExpectedErr != err {
+			if !errors.Is(tc.ExpectedErr, err) {
 				t.Fatal(err)
 			}
 			if diff := cmp.Diff(tc.ExpectedQuestions, questions); diff != "" {
@@ -141,9 +146,10 @@ func TestServiceGetAll(t *testing.T) {
 
 func TestServiceCreate(t *testing.T) {
 	var predefinedQuestions = []questionnaire.Question{
-		{ID: 1, Question: "How many word in \"Quipper\"?", Answer: "7"},
+		{ID: 1, Question: "How many characters are there in \"Quipper\"?", Answer: "7"},
 		{ID: 2, Question: "Guess random number, 1, 2, 3 or 4?", Answer: "4"},
 	}
+
 	tt := []struct {
 		Name           string
 		Question       *questionnaire.Question
@@ -173,11 +179,12 @@ func TestServiceCreate(t *testing.T) {
 	}
 
 	ctx := context.Background()
+
 	for _, tc := range tt {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			qs := questionnaire.NewService(tc.MockRepository)
-			if err := qs.Create(ctx, tc.Question); tc.ExpectedErr != err {
+			if err := qs.Create(ctx, tc.Question); !errors.Is(tc.ExpectedErr, err) {
 				t.Fatal(err)
 			}
 		})
@@ -186,9 +193,10 @@ func TestServiceCreate(t *testing.T) {
 
 func TestServiceUpdate(t *testing.T) {
 	var predefinedQuestions = []questionnaire.Question{
-		{ID: 1, Question: "How many word in \"Quipper\"?", Answer: "7"},
+		{ID: 1, Question: "How many characters are there in \"Quipper\"?", Answer: "7"},
 		{ID: 2, Question: "Guess random number, 1, 2, 3 or 4?", Answer: "4"},
 	}
+
 	tt := []struct {
 		Name           string
 		Question       *questionnaire.Question
@@ -218,11 +226,12 @@ func TestServiceUpdate(t *testing.T) {
 	}
 
 	ctx := context.Background()
+
 	for _, tc := range tt {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			qs := questionnaire.NewService(tc.MockRepository)
-			if err := qs.Update(ctx, tc.Question); tc.ExpectedErr != err {
+			if err := qs.Update(ctx, tc.Question); !errors.Is(tc.ExpectedErr, err) {
 				t.Fatal(err)
 			}
 		})
@@ -259,11 +268,12 @@ func TestServiceDelete(t *testing.T) {
 	}
 
 	ctx := context.Background()
+
 	for _, tc := range tt {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			qs := questionnaire.NewService(tc.MockRepository)
-			if err := qs.Delete(ctx, tc.QuestionID); tc.ExpectedErr != err {
+			if err := qs.Delete(ctx, tc.QuestionID); !errors.Is(tc.ExpectedErr, err) {
 				t.Fatal(err)
 			}
 		})
@@ -272,9 +282,10 @@ func TestServiceDelete(t *testing.T) {
 
 func TestServiceAnswer(t *testing.T) {
 	var predefinedQuestions = []questionnaire.Question{
-		{ID: 1, Question: "How many word in \"Quipper\"?", Answer: "7"},
+		{ID: 1, Question: "How many characters are there in \"Quipper\"?", Answer: "7"},
 		{ID: 2, Question: "Guess random number, 1, 2, 3 or 4?", Answer: "4"},
 	}
+
 	tt := []struct {
 		Name                string
 		QuestionID          int
@@ -334,12 +345,13 @@ func TestServiceAnswer(t *testing.T) {
 	}
 
 	ctx := context.Background()
+
 	for _, tc := range tt {
 		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			qs := questionnaire.NewService(tc.MockRepository)
 			correct, err := qs.Answer(ctx, tc.QuestionID, tc.Answer)
-			if tc.ExpectedErr != err {
+			if !errors.Is(tc.ExpectedErr, err) {
 				t.Fatal(err)
 			}
 			if tc.ExpectedCorrectness != correct {
