@@ -41,6 +41,7 @@ A : five
 Answer : 5 is correct
 Answer : five is correct
 ```
+Limitation: now it can only figure out number 0-10.
 
 ## Setup
 This following command will run all unit tests and compile the code as `/bin/quiz_master` (linux binary)

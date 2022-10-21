@@ -69,7 +69,22 @@ func SplitWithOptions(s string, seps []rune, quoteAware, includeSep bool) []stri
 	return subseps
 }
 
+var stringsNumber = map[string]string{
+	"zero":  "0",
+	"one":   "1",
+	"two":   "2",
+	"three": "3",
+	"four":  "4",
+	"five":  "5",
+	"six":   "6",
+	"seven": "7",
+	"eight": "8",
+	"nine":  "9",
+	"ten":   "10",
+}
+
 // RecognizedAsNumber converts all substrings in the given s that represent numbers.
+// Limitation only handle 0 to 10.
 // Examples:
 //
 //   - one, two, three or four?! -> 1, 2, 3 or 4?!
@@ -83,31 +98,11 @@ func RecognizedAsNumber(s string) string {
 	parts := SplitWithOptions(s, append(commonSymbolsCoverNumber, sep), false, true)
 	for i, part := range parts {
 		part := strings.ToLower(part)
-
-		switch part {
-		case "zero":
-			part = "0"
-		case "one":
-			part = "1"
-		case "two":
-			part = "2"
-		case "three":
-			part = "3"
-		case "four":
-			part = "4"
-		case "five":
-			part = "5"
-		case "six":
-			part = "6"
-		case "seven":
-			part = "7"
-		case "eight":
-			part = "8"
-		case "nine":
-			part = "9"
+		v, ok := stringsNumber[part]
+		if !ok {
+			continue
 		}
-
-		parts[i] = part
+		parts[i] = v
 	}
 
 	return strings.Join(parts, "")
